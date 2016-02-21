@@ -27,7 +27,7 @@
         <script type="text/javascript">
 		function init() {
 			show_menu();
-
+			buildswitch();
 		}
         var kn = '00D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F';
         var ke = '010001';
@@ -54,6 +54,19 @@
 
 		}
 
+		function buildswitch(){
+			$("#switch").click(
+			function(){
+				if(document.getElementById('switch').checked){
+					document.form.kuainiao_enable.value = 1;
+					document.getElementById('Kuainiao_detail_table').style.display = "";
+				}else{
+					document.form.kuainiao_enable.value = 0;
+					document.getElementById('Kuainiao_detail_table').style.display = "none";
+				}
+			});
+		}
+
 		function reload_Soft_Center() {
 			location.href = "/Main_Soft_center.asp";
 		}
@@ -77,6 +90,7 @@
 			<input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>"/>
 			<input type="hidden" id="kuainiao_config_pwd" name="kuainiao_config_pwd" value='<% dbus_get_def("kuainiao_config_pwd", ""); %>'/>
 			<input type="hidden" id="kuainiao_warning" name="kuainiao_warning" value='<% dbus_get_def("kuainiao_warning", ""); %>'/>
+			<input type="hidden" id="kuainiao_enable" name="kuainiao_enable" value='<% dbus_get_def("kuainiao_enable", "0"); %>'/>
 
 			<table class="content" align="center" cellpadding="0" cellspacing="0">
 				<tr>
@@ -121,13 +135,13 @@
 																</label>
 															</div>
 															<div id="update_button" style="padding-top:5px;margin-left:100px;margin-top:-35px;float: left;">
-																<button id="updateBtn" class="button_gen" onclick="update_shadowvpn(this, ' Refresh ');">检查更新</button>
+																<button id="updateBtn" class="button_gen" onclick="update_kuainiao(this, ' Refresh ');">检查更新</button>
 															</div>
-															<div id="shadowvpn_install_show" style="padding-top:5px;margin-left:80px;margin-top:-30px;float: left;"></div>
+															<div id="kuainiao_install_show" style="padding-top:5px;margin-left:80px;margin-top:-30px;float: left;"></div>
 													</td>
 													</tr>
 		                                    	</table>
-												<table style="margin:10px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="ShadowVPN_detail_table">
+												<table style="margin:10px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="Kuainiao_detail_table">
 													<thead>
 													<tr>
 														<td colspan="2">基本设置</td>
@@ -183,7 +197,7 @@
 												<div class="KoolshareBottom">
 													<br/>论坛技术支持： <a href="http://www.koolshare.cn" target="_blank"> <i><u>www.koolshare.cn</u></i> </a> <br/>
 													后台技术支持： <i>Xiaobao</i> <br/>
-													Shell, Web by： <i>fw867</i><br/>
+													Shell, Web by： <i>wangchll</i><br/>
 												</div>
 											</td>
 										</tr>
