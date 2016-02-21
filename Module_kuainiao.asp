@@ -7,7 +7,7 @@
 		<meta HTTP-EQUIV="Expires" CONTENT="-1"/>
 		<link rel="shortcut icon" href="images/favicon.png"/>
 		<link rel="icon" href="images/favicon.png"/>
-		<title>软件中心 - ShadowVPN</title>
+		<title>软件中心 - 迅雷快鸟设置</title>
 		<link rel="stylesheet" type="text/css" href="index_style.css"/>
 		<link rel="stylesheet" type="text/css" href="form_style.css"/>
 		<link rel="stylesheet" type="text/css" href="usp_style.css"/>
@@ -21,9 +21,14 @@
 		<script type="text/javascript" src="/js/jquery.js"></script>
 		<script type="text/javascript" src="/general.js"></script>
 		<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
+		<script type="text/javascript" src="/dbconf?p=kuainiao_&v=<% uptime(); %>"></script>
         <script type="text/javascript" src="http://i.xunlei.com/login/lib/rsa.js"></script>
         <script type="text/javascript" src="http://i.xunlei.com/login/lib/md5.js"></script>
         <script type="text/javascript">
+		function init() {
+			show_menu();
+
+		}
         var kn = '00D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F';
         var ke = '010001';
 
@@ -37,16 +42,26 @@
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
 			//开始赋值
-			//$("#kuainiao_config_uname").val("wangchll");
 			var pwd = $("#kuainiao_config_old_pwd").val();
 			var encrypted_pwd = rsa.encrypt(md5(pwd));
 			$("#kuainiao_config_pwd").val(encrypted_pwd.toUpperCase());
 			showLoading(5);
 			document.form.submit();
+			setTimeout("Warning_show()", 6000)
+		}
+
+		function Warning_show() {
+
+		}
+
+		function reload_Soft_Center() {
+			location.href = "/Main_Soft_center.asp";
 		}
         </script>
     </head>
-    <body>
+    <body onload="init();">
+		<div id="TopBanner"></div>
+		<div id="Loading" class="popup_bg"></div>
 		<iframe name="hidden_frame" id="hidden_frame" src="" width="0" height="0" frameborder="0"></iframe>
 		<form method="post" name="form" action="/applydb.cgi?p=kuainiao_" target="hidden_frame">
 			<input type="hidden" name="current_page" value="Module_kuainiao.asp"/>
@@ -60,11 +75,127 @@
 			<input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>"/>
 			<input type="hidden" name="SystemCmd" onkeydown="onSubmitCtrl(this, ' Refresh ')" value="config-kuainiao.sh"/>
 			<input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>"/>
-			<input type="text" id="kuainiao_config_uname" name="kuainiao_config_uname" value='<% dbus_get_def("kuainiao_config_uname", ""); %>'/>
-			<input type="text" id="kuainiao_config_old_pwd" name="kuainiao_config_old_pwd" value='<% dbus_get_def("kuainiao_config_old_pwd", ""); %>'/>
 			<input type="hidden" id="kuainiao_config_pwd" name="kuainiao_config_pwd" value='<% dbus_get_def("kuainiao_config_pwd", ""); %>'/>
-			<input type="text" id="kuainiao_warning" name="kuainiao_warning" value='<% dbus_get_def("kuainiao_warning", ""); %>'/>
-			<button id="cmdBtn" class="" onclick="onSubmitCtrl(this, ' Refresh ')">提交</button>
+			<input type="hidden" id="kuainiao_warning" name="kuainiao_warning" value='<% dbus_get_def("kuainiao_warning", ""); %>'/>
+
+			<table class="content" align="center" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="17">&nbsp;</td>
+					<td valign="top" width="202">
+						<div id="mainMenu"></div>
+						<div id="subMenu"></div>
+					</td>
+					<td valign="top">
+						<div id="tabMenu" class="submenuBlock"></div>
+						<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
+							<tr>
+								<td align="left" valign="top">
+									<table width="760px" border="0" cellpadding="5" cellspacing="0" bordercolor="#6b8fa3" class="FormTitle" id="FormTitle">
+										<tr>
+											<td bgcolor="#4D595D" colspan="3" valign="top">
+												<div>&nbsp;</div>
+												<div style="float:left;" class="formfonttitle">迅雷快鸟</div>
+												<div style="float:right; width:15px; height:25px;margin-top:10px"><img id="return_btn" onclick="reload_Soft_Center();" align="right" style="cursor:pointer;position:absolute;margin-left:-30px;margin-top:-25px;" title="返回软件中心" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'"></img></div>
+												<div style="margin-left:5px;margin-top:10px;margin-bottom:10px"><img src="/images/New_ui/export/line_export.png"></div>
+												<div class="formfontdesc" style="padding-top:5px;margin-top:0px;float: left;" id="cmdDesc">迅雷快鸟加速服务，带宽平均提升5倍，最高可达100M</div>
+												<div id="kuainiao_version_status" style="padding-top:5px;margin-left:30px;margin-top:0px;float: left;"><i>当前版本：<% dbus_get_def("kuainiao_version", "0"); %></i></div>
+												<div class="formfontdesc" id="cmdDesc"></div>
+												<table style="margin:10px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="routing_table">
+													<thead>
+													<tr>
+														<td colspan="2">开关设置</td>
+													</tr>
+													</thead>
+													<tr>
+													<th>开启快鸟加速</th>
+														<td colspan="2">
+															<div class="switch_field" style="display:table-cell">
+																<label for="switch">
+																	<input id="switch" class="switch" type="checkbox" style="display: none;">
+																	<div class="switch_container" >
+																		<div class="switch_bar"></div>
+																		<div class="switch_circle transition_style">
+																			<div></div>
+																		</div>
+																	</div>
+																</label>
+															</div>
+															<div id="update_button" style="padding-top:5px;margin-left:100px;margin-top:-35px;float: left;">
+																<button id="updateBtn" class="button_gen" onclick="update_shadowvpn(this, ' Refresh ');">检查更新</button>
+															</div>
+															<div id="shadowvpn_install_show" style="padding-top:5px;margin-left:80px;margin-top:-30px;float: left;"></div>
+													</td>
+													</tr>
+		                                    	</table>
+												<table style="margin:10px 0px 0px 0px;" width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="ShadowVPN_detail_table">
+													<thead>
+													<tr>
+														<td colspan="2">基本设置</td>
+													</tr>
+													</thead>
+													<tr>
+														<th width="35%">迅雷用户名</th>
+														<td>
+															<input type="text" class="input_ss_table" style="width:auto;" size="30" id="kuainiao_config_uname" name="kuainiao_config_uname" maxlength="20" placeholder="迅雷用户名" value='<% dbus_get_def("kuainiao_config_uname", ""); %>' >
+														</td>
+													</tr>
+													<tr>
+														<th width="35%">密码</th>
+														<td>
+															<input  type="text" class="input_ss_table" style="width:auto;" size="20"  id="kuainiao_config_old_pwd" name="kuainiao_config_old_pwd" maxlength="30" placeholder="迅雷密码" value='<% dbus_get_def("kuainiao_config_old_pwd", ""); %>' />
+														</td>
+													</tr>
+
+													<tr>
+													<thead>
+													<tr>
+														<td colspan="4">启动设置</td>
+													</tr>
+													</thead>
+													    <th width="35%">开机自启</th>
+														<td>
+															<select id="kuainiao_start" name="kuainiao_start" class="input_option" onclick="update_visibility();" >
+																<option value="1">是</option>
+																<option value="2">否</option>
+															</select>
+														</td>
+													</tr>
+
+		                                    	    <tr>
+													    <th width="35%">启动延时</th>
+														<td>
+															<select id="kuainiao_time" name="kuainiao_time" class="input_option" onclick="update_visibility();" >
+																<option value="1">10S</option>
+																<option value="2">15S</option>
+																<option value="3">20S</option>
+																<option value="4">30S</option>
+																<option value="5">60S</option>
+															</select>
+														</td>
+													</tr>
+
+		 										</table>
+		 										<div id="warn" style="display: none;margin-top: 20px;text-align: center;font-size: 20px;margin-bottom: 20px;"class="formfontdesc" id="cmdDesc"><i>你已经开启shadowsocks,请先关闭后才能开启shadowvpn</i></div>
+												<div class="apply_gen">
+													<button id="cmdBtn" class="button_gen" onclick="onSubmitCtrl(this, ' Refresh ')">提交</button>
+												</div>
+												<div style="margin-left:5px;margin-top:10px;margin-bottom:10px"><img src="/images/New_ui/export/line_export.png"></div>
+												<div class="KoolshareBottom">
+													<br/>论坛技术支持： <a href="http://www.koolshare.cn" target="_blank"> <i><u>www.koolshare.cn</u></i> </a> <br/>
+													后台技术支持： <i>Xiaobao</i> <br/>
+													Shell, Web by： <i>fw867</i><br/>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td width="10" align="center" valign="top"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
 		</form>
+		<div id="footer"></div>
     </body>
 </html>
