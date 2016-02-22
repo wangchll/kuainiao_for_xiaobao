@@ -4,6 +4,8 @@ source /koolshare/scripts/base.sh
 version="0.0.1"
 dbus set kuainiao_warning=""
 dbus set kuainiao_can_upgrade=0
+kuainiaocru=$(cru l | grep "kuainiao"cr)
+startkuainiao=$(cat /jffs/scripts/wan-start | grep "kuainiao")
 
 TEST_URL="https://baidu.com"
 if [ ! -z "`wget --no-check-certificate -O - $TEST_URL 2>&1|grep "100%"`" ]
@@ -21,6 +23,10 @@ uname=$kuainiao_config_uname
 pwd=$kuainiao_config_pwd
 nic=eth0
 peerid=$(ifconfig $nic|grep $nic|awk 'gsub(/:/, "") {print $5}')004V
+
+#转存参数
+dbus set kuainiao_config_nic=$nic
+dbus set kuainiao_config_peerid=$peerid
 #peerid=ACBC32AF6EED004V
 #uid_orig=$uid
 
@@ -52,6 +58,7 @@ get_kuainiao_api(){
 			#echo "迅雷快鸟服务API获取失败，请检查网络环境，或稍后再试!"
 		else
 			api_url="http://$portal_ip:$portal_port/v2"
+			dbus set kuainiao_config_api=$api_url
 	fi
 }
 
@@ -132,15 +139,56 @@ kuainiao_recover(){
 	echo $recover
 }
 
+#将执行脚本写入crontab定时运行
+add_kuainiao_cru(){
+	if [ "$kuainiao_can_upgrade" == "1" ] && [ -f /koolshare/kuainiao/kuainiao.sh ]; then
+		#确保有执行权限
+		chmod +x /koolshare/kuainiao/kuainiao.sh
+		cru a kuainiao "*/4 * * * * /koolshare/kuainiao/kuainiao.sh"
+	fi
+}
+
+#加入开机自动运行
+auto_start(){
+	if [ "$kuainiao_can_upgrade" == "1" ] && [ "$kuainiao_start" == "1" ]; then
+		if [ ! -f /jffs/scripts/wan-start ]; then
+			cat > /jffs/scripts/wan-start <<EOF
+#!/bin/sh
+dbus fire onwanstart
+EOF
+		fi
+		echo $(date): Adding service to wan-start...
+		if [ -z "$startkuainiao" ];then
+			if [ ! -f /koolshare/kuainiao/kuainiao.sh ]; then
+				dbus set kuainiao_warning="迅雷快鸟缺少执行文件，请检查安装情况!"
+			else
+				sed -i '$a cru a kuainiao "*/4 * * * * /koolshare/kuainiao/kuainiao.sh"' /jffs/scripts/wan-start
+			fi
+		fi
+	chmod +x /jffs/scripts/wan-start
+	fi
+}
+
+#停止快鸟服务
+stop_kuainiao(){
+	#停掉cru里的任务
+	if [ ! -z "$kuainiaocru" ]; then
+		cru d kuainiao
+	fi
+	#停止自启动
+	sed -i '/kuainiao/d' /jffs/scripts/wan-start >/dev/null 2>&1
+}
+
 ##测试demo逻辑
 get_xunlei_uid
 
 if [ -n "$uid" ]; then
 	get_kuainiao_api
 	get_bandwidth
-	#echo "本身带宽:"`expr $old_downstream / 1024`"M"
-	#echo "最大提速带宽:"`expr $max_downstream / 1024`"M"
-	#check_kuainiao
-	#query_try_info
-	#bandwidth
+	dbus set kuainiao_config_downstream=$(expr $old_downstream / 1024)
+	dbus set kuainiao_config_max_downstream=$(expr $max_downstream / 1024)
+	#写入crontab
+	add_kuainiao_cru
+	#开机执行
+	auto_start
 fi

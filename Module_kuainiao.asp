@@ -28,6 +28,14 @@
 		function init() {
 			show_menu();
 			buildswitch();
+			var rrt = document.getElementById("switch");
+		    if (document.form.kuainiao_enable.value != "1") {
+		        rrt.checked = false;
+		        document.getElementById('Kuainiao_detail_table').style.display = "none";
+		    } else {
+		        rrt.checked = true;
+		        document.getElementById('Kuainiao_detail_table').style.display = "";
+		    }
 		}
         var kn = '00D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F';
         var ke = '010001';
