@@ -25,11 +25,13 @@ api_url=$kuainiao_config_api
 #初始化计数器
 if [ -z "$kuainiao_run_i" ]; then
 	dbus ram kuainiao_run_i=6
+	kuainiao_run_i=6
 fi
 
 #初始化运行状态(kuainiao_run_status 0表示运行异常，1表示运行正常)
 if [ -z "$kuainiao_run_status" ]; then
 	dbus ram kuainiao_run_status=0
+	kuainiao_run_status=0
 fi
 
 #判断是否可以加速
@@ -45,6 +47,7 @@ if [[ -z $kuainiao_run_orig_day ]]; then
 	day_of_month_orig=`date +%d`
 	orig_day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
 	dbus ram kuainiao_run_orig_day=$orig_day_of_month
+	kuainiao_run_orig_day=$orig_day_of_month
 fi
 
 #开始执行逻辑
@@ -53,8 +56,10 @@ day_of_month_orig=`date +%d`
 day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
 if [[ -z $kuainiao_run_orig_day || $day_of_month -ne $kuainiao_run_orig_day ]]; then
 	dbus ram kuainiao_run_orig_day=$day_of_month
+	kuainiao_run_orig_day=$day_of_month
 	$HTTP_REQ "$api_url/recover?peerid=$peerid&userid=$uid&user_type=1&sessionid=$kuainiao_run_session"
 	dbus ram kuainiao_run_i=6
+	kuainiao_run_i=6
 	sleep 5
 fi
 
@@ -63,8 +68,6 @@ if test $kuainiao_run_i -ge 6; then
 	ret=`$HTTP_REQ https://login.mobile.reg2t.sandai.net:443/ $POST_ARG"{\"userName\": \""$uid"\", \"businessType\": 68, \"clientVersion\": \"1.1\", \"appName\": \"ANDROID-com.xunlei.vip.swjsq\", \"isCompressed\": 0, \"sequenceNo\": 1000001, \"sessionID\": \"\", \"loginType\": 1, \"rsaKey\": {\"e\": \"10001\", \"n\": \"D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F\"}, \"cmdID\": 1, \"verifyCode\": \"\", \"peerID\": \""$peerid"\", \"protocolVersion\": 101, \"platformVersion\": 1, \"passWord\": \""$pwd"\", \"extensionList\": \"\", \"verifyKey\": \"\"}"`
 	session=`echo $ret|awk -F '"sessionID":' '{print $2}'|awk -F ',' '{print $1}'|grep -oE "[A-F,0-9]{32}"`
 	uid=`echo $ret|awk -F '"userID":' '{print $2}' | awk -F ',' '{print $1}'`
-	#登陆完成重置计数器
-	dbus ram kuainiao_run_i=0
 	#判断登陆是否成功
 	if [ -z "$session" ]; then
 		#登陆失败重置计数器到6
@@ -78,11 +81,16 @@ if test $kuainiao_run_i -ge 6; then
 		orig_day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
 		dbus ram kuainiao_run_orig_day=$orig_day_of_month
 		dbus ram kuainiao_run_session=$session
+		kuainiao_run_orig_day=$orig_day_of_month
+		kuainiao_run_session=$session
 	fi
 	#判断返回的uid
 	if [ -z "$uid" ]; then
 		uid=$uid_orig
 	fi
+	#登陆完成重置计数器
+	dbus ram kuainiao_run_i=0
+	kuainiao_run_i=0
 	#开始加速
 	$HTTP_REQ "$api_url/upgrade?peerid=$peerid&userid=$uid&user_type=1&sessionid=$kuainiao_run_session"
 fi

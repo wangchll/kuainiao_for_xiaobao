@@ -68,6 +68,7 @@ get_bandwidth(){
 		band=$(bandwidth)
 		can_upgrade=`echo $band|awk -F '"can_upgrade":' '{print $2}'|awk -F ',' '{print $1}'`
 		dbus set kuainiao_can_upgrade=$can_upgrade
+		kuainiao_can_upgrade=$can_upgrade
 		#判断是否满足加速条件
 		if [[ $can_upgrade -eq 1 ]]; then
 			#echo "迅雷快鸟可以加速~~~愉快的开始加速吧~~"
