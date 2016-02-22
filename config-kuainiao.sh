@@ -4,8 +4,8 @@ source /koolshare/scripts/base.sh
 version="0.0.1"
 dbus set kuainiao_warning=""
 dbus set kuainiao_can_upgrade=0
-kuainiaocru=$(cru l | grep "kuainiao"cr)
-startkuainiao=$(cat /jffs/scripts/wan-start | grep "kuainiao")
+kuainiaocru=$(cru l | grep "kuainiao")
+startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
 
 TEST_URL="https://baidu.com"
 if [ ! -z "`wget --no-check-certificate -O - $TEST_URL 2>&1|grep "100%"`" ]
@@ -150,22 +150,15 @@ add_kuainiao_cru(){
 
 #加入开机自动运行
 auto_start(){
-	if [ "$kuainiao_can_upgrade" == "1" ] && [ "$kuainiao_start" == "1" ]; then
-		if [ ! -f /jffs/scripts/wan-start ]; then
-			cat > /jffs/scripts/wan-start <<EOF
+	if [ "$kuainiao_can_upgrade" == "1" ] && [ "$kuainiao_start" == "1" ] && [ -f /koolshare/kuainiao/kuainiao.sh ]; then
+		if [ -f /koolshare/init.d/S80Kuainiao.sh ]; then
+			rm -rf /koolshare/init.d/S80Kuainiao.sh
+		fi
+		cat > /koolshare/init.d/S80Kuainiao.sh <<EOF
 #!/bin/sh
-dbus fire onwanstart
+cru a kuainiao "*/4 * * * * /koolshare/kuainiao/kuainiao.sh"
 EOF
-		fi
-		echo $(date): Adding service to wan-start...
-		if [ -z "$startkuainiao" ];then
-			if [ ! -f /koolshare/kuainiao/kuainiao.sh ]; then
-				dbus set kuainiao_warning="迅雷快鸟缺少执行文件，请检查安装情况!"
-			else
-				sed -i '$a cru a kuainiao "*/4 * * * * /koolshare/kuainiao/kuainiao.sh"' /jffs/scripts/wan-start
-			fi
-		fi
-	chmod +x /jffs/scripts/wan-start
+		chmod +x /koolshare/init.d/S80Kuainiao.sh
 	fi
 }
 
@@ -176,19 +169,26 @@ stop_kuainiao(){
 		cru d kuainiao
 	fi
 	#停止自启动
-	sed -i '/kuainiao/d' /jffs/scripts/wan-start >/dev/null 2>&1
+	if [ -f /koolshare/init.d/S80Kuainiao.sh ]; then
+		rm -rf /koolshare/init.d/S80Kuainiao.sh
+	fi
 }
 
-##测试demo逻辑
-get_xunlei_uid
-
-if [ -n "$uid" ]; then
-	get_kuainiao_api
-	get_bandwidth
-	dbus set kuainiao_config_downstream=$(expr $old_downstream / 1024)
-	dbus set kuainiao_config_max_downstream=$(expr $max_downstream / 1024)
-	#写入crontab
-	add_kuainiao_cru
-	#开机执行
-	auto_start
+##主逻辑
+if [ "$kuainiao_enable" == "1" ]; then
+	#登陆迅雷获取uid
+	get_xunlei_uid
+	#判断是否登陆成功
+	if [ -n "$uid" ]; then
+		get_kuainiao_api
+		get_bandwidth
+		dbus set kuainiao_config_downstream=$(expr $old_downstream / 1024)
+		dbus set kuainiao_config_max_downstream=$(expr $max_downstream / 1024)
+		#写入crontab
+		add_kuainiao_cru
+		#开机执行
+		auto_start
+	fi
+else
+	stop_kuainiao
 fi

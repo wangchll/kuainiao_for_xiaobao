@@ -24,20 +24,27 @@ api_url=$kuainiao_config_api
 
 #初始化计数器
 if [ -z "$kuainiao_run_i" ]; then
-	dbus set kuainiao_run_i=6
+	dbus ram kuainiao_run_i=6
 fi
 
 #初始化运行状态(kuainiao_run_status 0表示运行异常，1表示运行正常)
 if [ -z "$kuainiao_run_status" ]; then
-	dbus set kuainiao_run_status=0
+	dbus ram kuainiao_run_status=0
 fi
 
 #判断是否可以加速
 if [[ ! $kuainiao_can_upgrade -eq 1 ]]; then
-	dbus set kuainiao_run_i=6
-	dbus set kuainiao_run_warnning="您的宽带不能使用讯鸟快鸟加速！"$(date "+%Y-%m-%d %H:%M:%S")
-	dbus set kuainiao_run_status=0
+	dbus ram kuainiao_run_i=6
+	dbus ram kuainiao_run_warnning="您的宽带不能使用讯鸟快鸟加速！"$(date "+%Y-%m-%d %H:%M:%S")
+	dbus ram kuainiao_run_status=0
 	exit 21
+fi
+
+#初始化日期
+if [[ -z $kuainiao_run_orig_day ]]; then
+	day_of_month_orig=`date +%d`
+	orig_day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
+	dbus ram kuainiao_run_orig_day=$orig_day_of_month
 fi
 
 #开始执行逻辑
@@ -45,9 +52,9 @@ fi
 day_of_month_orig=`date +%d`
 day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
 if [[ -z $kuainiao_run_orig_day || $day_of_month -ne $kuainiao_run_orig_day ]]; then
-	dbus set kuainiao_run_orig_day=$day_of_month
+	dbus ram kuainiao_run_orig_day=$day_of_month
 	$HTTP_REQ "$api_url/recover?peerid=$peerid&userid=$uid&user_type=1&sessionid=$kuainiao_run_session"
-	dbus set kuainiao_run_i=6
+	dbus ram kuainiao_run_i=6
 	sleep 5
 fi
 
@@ -57,20 +64,20 @@ if test $kuainiao_run_i -ge 6; then
 	session=`echo $ret|awk -F '"sessionID":' '{print $2}'|awk -F ',' '{print $1}'|grep -oE "[A-F,0-9]{32}"`
 	uid=`echo $ret|awk -F '"userID":' '{print $2}' | awk -F ',' '{print $1}'`
 	#登陆完成重置计数器
-	dbus set kuainiao_run_i=0
+	dbus ram kuainiao_run_i=0
 	#判断登陆是否成功
 	if [ -z "$session" ]; then
 		#登陆失败重置计数器到6
-		dbus set kuainiao_run_i=6
-		dbus set kuainiao_run_warnning="迅雷账号登陆失败！请检查迅雷账号配置！"$(date "+%Y-%m-%d %H:%M:%S")
-		dbus set kuainiao_run_status=0
+		dbus ram kuainiao_run_i=6
+		dbus ram kuainiao_run_warnning="迅雷账号登陆失败！请检查迅雷账号配置！"$(date "+%Y-%m-%d %H:%M:%S")
+		dbus ram kuainiao_run_status=0
 		exit 20
 	else
 		#登陆成功设置登陆日期和session
 		day_of_month_orig=`date +%d`
 		orig_day_of_month=`echo $day_of_month_orig|grep -oE "[1-9]{1,2}"`
-		dbus set kuainiao_run_orig_day=$orig_day_of_month
-		dbus set kuainiao_run_session=$session
+		dbus ram kuainiao_run_orig_day=$orig_day_of_month
+		dbus ram kuainiao_run_session=$session
 	fi
 	#判断返回的uid
 	if [ -z "$uid" ]; then
@@ -85,12 +92,12 @@ sleep 1
 #保持心跳
 ret=`$HTTP_REQ "$api_url/keepalive?peerid=$peerid&userid=$uid&user_type=1&sessionid=$kuainiao_run_session"`
 if [ ! -z "`echo $ret|grep "not exist channel"`" ]; then
-	dbus set kuainiao_run_i=6
-	dbus set kuainiao_run_warnning="迅雷快鸟心跳保持失败！"$(date "+%Y-%m-%d %H:%M:%S")
-	dbus set kuainiao_run_status=0
-	exit 21
+	dbus ram kuainiao_run_i=6
+	dbus ram kuainiao_run_warnning="迅雷快鸟心跳保持失败！"$(date "+%Y-%m-%d %H:%M:%S")
+	dbus ram kuainiao_run_status=0
+	exit 22
 else
-	dbus set kuainiao_run_i=$(expr $kuainiao_run_i + 1)
-	dbus set kuainiao_run_warnning="迅雷快鸟运行正常！"$(date "+%Y-%m-%d %H:%M:%S")
-	dbus set kuainiao_run_status=1
+	dbus ram kuainiao_run_i=$(expr $kuainiao_run_i + 1)
+	dbus ram kuainiao_run_warnning="迅雷快鸟运行正常！"$(date "+%Y-%m-%d %H:%M:%S")
+	dbus ram kuainiao_run_status=1
 fi
