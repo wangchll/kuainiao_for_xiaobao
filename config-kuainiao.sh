@@ -238,8 +238,10 @@ if [ "$kuainiao_update_check" == "1" ];then
 fi
 
 ##主逻辑
+#执行初始化
 dbus set kuainiao_warning=""
 dbus set kuainiao_can_upgrade=0
+stop_kuainiao
 
 if [ "$kuainiao_enable" == "1" ]; then
 	#登陆迅雷获取uid
@@ -266,6 +268,4 @@ if [ "$kuainiao_enable" == "1" ]; then
 		dbus ram kuainiao_run_i=6
 		sh /koolshare/kuainiao/kuainiao.sh
 	fi
-else
-	stop_kuainiao
 fi

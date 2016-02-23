@@ -40,6 +40,8 @@
 			//var conf_ajax = setInterval("conf2obj();", 60000);
 			version_show();
 			write_kuainiao_install_status();
+			check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
+			check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
 		}
         var kn = '00D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F';
         var ke = '010001';
@@ -105,6 +107,8 @@
 				$("#warn").html($("#kuainiao_warning").val());
 				showhide("warn", ($("#kuainiao_can_upgrade").val() == "0"));
 			}
+			$("#warn").html($("#kuainiao_warning").val());
+			showhide("warn", ($("#kuainiao_can_upgrade").val() == "0"));
 			//给出快鸟运行状态
 			$("#kn_state2").html($("#kuainiao_run_warnning").val());
 		}
@@ -164,8 +168,8 @@
 						}
 					}
 					update_visibility();
-					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
-					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
+					//check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
+					//check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
 					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_can_upgrade);
 
 					setTimeout("write_kuainiao_install_status()", 2000);
