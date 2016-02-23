@@ -5,7 +5,6 @@ version="0.0.1"
 kuainiaocru=$(cru l | grep "kuainiao")
 startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
 
-
 #定义请求函数
 HTTP_REQ="wget --no-check-certificate -O - "
 POST_ARG="--post-data="
