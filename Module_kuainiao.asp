@@ -36,8 +36,8 @@
 		        rrt.checked = true;
 		        document.getElementById('Kuainiao_detail_table').style.display = "";
 		    }
-			//conf2obj();
-			//var conf_ajax = setInterval("conf2obj();", 60000);
+			conf2obj();
+			var conf_ajax = setInterval("conf2obj();", 60000);
 			version_show();
 			write_kuainiao_install_status();
 		}
@@ -58,7 +58,7 @@
 			$("#kuainiao_update_check").val(0);
 			showLoading(9);
 			document.form.submit();
-			//setTimeout("conf2obj()", 8000);
+			setTimeout("conf2obj()", 8000);
 		}
 
 		function pass_checked(obj){
@@ -153,19 +153,6 @@
 					} else {
 						$("#kuainiao_install_show").html("");
 					}
-					//合并代码
-					var p = "kuainiao_";
-			        var params = ["config_pwd", "warning", "enable","can_upgrade", "run_status", "run_warnning"];
-			        for (var i = 0; i < params.length; i++) {
-						if (typeof db_kuainiao_[p + params[i]] !== "undefined") {
-							$("#kuainiao_"+params[i]).val(db_kuainiao_[p + params[i]]);
-						}
-			        }
-					update_visibility();
-					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
-					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
-					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream));
-
 					setTimeout("write_kuainiao_install_status()", 2000);
 				}
 			});
