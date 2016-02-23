@@ -36,6 +36,8 @@
 		        rrt.checked = true;
 		        document.getElementById('Kuainiao_detail_table').style.display = "";
 		    }
+			conf2obj();
+			var conf_ajax = setInterval("conf2obj();", 60000);
 		}
         var kn = '00D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDCB4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC752EFA047DF4710C7D67CA025A2DC3EA59B09A9F2E3A41D4A7EFBB31C738B35FFAAA5C6F4E6F';
         var ke = '010001';
@@ -43,23 +45,41 @@
         var rsa = new RSAKey();
 
         rsa.setPublic(kn, ke);
-        //var encrypted_pwd = rsa.encrypt(md5(pwd));
-        //console.log(md5(pwd));
-        //console.log(encrypted_pwd.toUpperCase());
-        //res.json({'encrypted_pwd':encrypted_pwd})
+
 		function onSubmitCtrl(o, s) {
 			document.form.action_mode.value = s;
 			//开始赋值
 			var pwd = $("#kuainiao_config_old_pwd").val();
 			var encrypted_pwd = rsa.encrypt(md5(pwd));
 			$("#kuainiao_config_pwd").val(encrypted_pwd.toUpperCase());
-			showLoading(5);
+			showLoading(9);
 			document.form.submit();
-			setTimeout("Warning_show()", 6000)
+			setTimeout("conf2obj()", 8000);
 		}
 
-		function Warning_show() {
+		function pass_checked(obj){
+			switchType(obj, document.form.show_pass.checked, true);
+		}
 
+		function conf2obj() {
+			$.ajax({
+				type: "get",
+				url: "dbconf?p=kuainiao_",
+				dataType: "script",
+				success: function(xhr) {
+			    	var p = "kuainiao_";
+			        var params = ["config_pwd", "warning", "enable","can_upgrade", "run_status", "run_warnning"];
+			        for (var i = 0; i < params.length; i++) {
+						if (typeof db_kuainiao_[p + params[i]] !== "undefined") {
+							$("#kuainiao_"+params[i]).val(db_kuainiao_[p + params[i]]);
+						}
+			        }
+					update_visibility();
+					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
+					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
+					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream));
+				}
+			});
 		}
 
 		function buildswitch(){
@@ -73,6 +93,32 @@
 					document.getElementById('Kuainiao_detail_table').style.display = "none";
 				}
 			});
+		}
+
+		function update_visibility() {
+			//不满足快鸟条件的显示异常信息
+			if ($("#kuainiao_can_upgrade").val() == "0") {
+				$("#warn").html($("#kuainiao_warning").val());
+				showhide("warn", ($("#kuainiao_can_upgrade").val() == "0"));
+			}
+			//给出快鸟运行状态
+			$("#kn_state2").html($("#kuainiao_run_warnning").val());
+		}
+
+		function check_selected(obj, m) {
+		    var o = document.getElementById(obj);
+		    for (var c = 0; c < o.length; c++) {
+		        if (o.options[c].value == m) {
+		            o.options[c].selected = true;
+		            break;
+		        }
+		    }
+		}
+
+		function check_downstream(old, max) {
+			if (max > 0 && max > old) {
+				$("#kn_upgreade_state").html("宽带已从"+old+"M提速到"+max+"M");
+			}
 		}
 
 		function reload_Soft_Center() {
@@ -99,6 +145,9 @@
 			<input type="hidden" id="kuainiao_config_pwd" name="kuainiao_config_pwd" value='<% dbus_get_def("kuainiao_config_pwd", ""); %>'/>
 			<input type="hidden" id="kuainiao_warning" name="kuainiao_warning" value='<% dbus_get_def("kuainiao_warning", ""); %>'/>
 			<input type="hidden" id="kuainiao_enable" name="kuainiao_enable" value='<% dbus_get_def("kuainiao_enable", "0"); %>'/>
+			<input type="hidden" id="kuainiao_can_upgrade" name="kuainiao_can_upgrade" value='<% dbus_get_def("kuainiao_can_upgrade", "0"); %>'/>
+			<input type="hidden" id="kuainiao_run_status" name="kuainiao_run_status" value='<% dbus_get_def("kuainiao_run_status", "0"); %>'/>
+			<input type="hidden" id="kuainiao_run_warnning" name="kuainiao_run_warnning" value='<% dbus_get_def("kuainiao_run_warnning", ""); %>'/>
 
 			<table class="content" align="center" cellpadding="0" cellspacing="0">
 				<tr>
@@ -164,21 +213,46 @@
 													<tr>
 														<th width="35%">密码</th>
 														<td>
-															<input  type="text" class="input_ss_table" style="width:auto;" size="20"  id="kuainiao_config_old_pwd" name="kuainiao_config_old_pwd" maxlength="30" placeholder="迅雷密码" value='<% dbus_get_def("kuainiao_config_old_pwd", ""); %>' />
+															<input  type="password" class="input_ss_table" style="width:auto;" size="20"  id="kuainiao_config_old_pwd" name="kuainiao_config_old_pwd" maxlength="30" placeholder="迅雷密码" value='<% dbus_get_def("kuainiao_config_old_pwd", ""); %>' />
+															<div style="margin-left:170px;margin-top:-20px;margin-bottom:0px"><input type="checkbox" name="show_pass" onclick="pass_checked(document.form.kuainiao_config_old_pwd);">显示密码</div>
+														</td>
+													</tr>
+
+													<thead>
+													<tr>
+														<td colspan="3">运行状态</td>
+													</tr>
+													</thead>
+													<tr>
+													    <th width="35%">快鸟状态</th>
+														<td>
+															<a>
+																<span style="display: none" id="kn_state1">尚未启用! </span>
+																<span id="kn_state2"></span>
+															</a>
 														</td>
 													</tr>
 
 													<tr>
+													    <th width="35%">提速状态</th>
+														<td>
+															<a>
+																<span id="kn_upgreade_state"></span>
+															</a>
+														</td>
+													</tr>
+
 													<thead>
 													<tr>
 														<td colspan="4">启动设置</td>
 													</tr>
 													</thead>
+													<tr>
 													    <th width="35%">开机自启</th>
 														<td>
-															<select id="kuainiao_start" name="kuainiao_start" class="input_option" onclick="update_visibility();" >
+															<select id="kuainiao_start" name="kuainiao_start" class="input_option"  >
 																<option value="1">是</option>
-																<option value="2">否</option>
+																<option value="0">否</option>
 															</select>
 														</td>
 													</tr>
@@ -186,18 +260,17 @@
 		                                    	    <tr>
 													    <th width="35%">启动延时</th>
 														<td>
-															<select id="kuainiao_time" name="kuainiao_time" class="input_option" onclick="update_visibility();" >
-																<option value="1">10S</option>
-																<option value="2">15S</option>
-																<option value="3">20S</option>
-																<option value="4">30S</option>
-																<option value="5">60S</option>
+															<select id="kuainiao_time" name="kuainiao_time" class="input_option"  >
+																<option value="1">1S</option>
+																<option value="5">5S</option>
+																<option value="10">10S</option>
 															</select>
 														</td>
 													</tr>
 
+
 		 										</table>
-		 										<div id="warn" style="display: none;margin-top: 20px;text-align: center;font-size: 20px;margin-bottom: 20px;"class="formfontdesc" id="cmdDesc"><i>你已经开启shadowsocks,请先关闭后才能开启shadowvpn</i></div>
+		 										<div id="warn" style="display: none;margin-top: 20px;text-align: center;font-size: 20px;margin-bottom: 20px;"class="formfontdesc" ><i>你已经开启shadowsocks,请先关闭后才能开启shadowvpn</i></div>
 												<div class="apply_gen">
 													<button id="cmdBtn" class="button_gen" onclick="onSubmitCtrl(this, ' Refresh ')">提交</button>
 												</div>

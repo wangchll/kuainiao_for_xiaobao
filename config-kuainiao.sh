@@ -7,16 +7,9 @@ dbus set kuainiao_can_upgrade=0
 kuainiaocru=$(cru l | grep "kuainiao")
 startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
 
-TEST_URL="https://baidu.com"
-if [ ! -z "`wget --no-check-certificate -O - $TEST_URL 2>&1|grep "100%"`" ]
-	then
-		HTTP_REQ="wget --no-check-certificate -O - "
-		POST_ARG="--post-data="
-	else
-		command -v curl >/dev/null 2>&1 && curl -kI $TEST_URL >/dev/null 2>&1 || { echo >&2 "Xunlei-FastD1ck cannot find wget or curl installed with https(ssl) enabled in this system."; exit 1; }
-		HTTP_REQ="curl -ks"
-		POST_ARG="--data "
-fi
+#定义请求函数
+HTTP_REQ="wget --no-check-certificate -O - "
+POST_ARG="--post-data="
 
 #数据mock
 uname=$kuainiao_config_uname
@@ -173,6 +166,12 @@ stop_kuainiao(){
 	if [ -f /koolshare/init.d/S80Kuainiao.sh ]; then
 		rm -rf /koolshare/init.d/S80Kuainiao.sh
 	fi
+	#清理运行环境临时变量
+	dbus remove kuainiao_run_i
+	dbus remove kuainiao_run_warnning
+	dbus remove kuainiao_run_status
+	dbus remove kuainiao_run_orig_day
+	dbus remove kuainiao_run_session
 }
 
 ##主逻辑
@@ -189,6 +188,15 @@ if [ "$kuainiao_enable" == "1" ]; then
 		add_kuainiao_cru
 		#开机执行
 		auto_start
+		#开始初始化执行
+		sleep $kuainiao_time
+		#判断cru脚本是否正在执行
+		kuainiao_is_run=$(ps|grep '/koolshare/kuainiao/kuainiao.sh'|grep -v grep)
+		if [ ! -z "$kuainiao_is_run" ]; then
+			sleep 5
+		fi
+		dbus ram kuainiao_run_i=6
+		sh /koolshare/kuainiao/kuainiao.sh
 	fi
 else
 	stop_kuainiao

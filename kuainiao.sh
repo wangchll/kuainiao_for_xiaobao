@@ -3,16 +3,9 @@ eval `dbus export kuainiao`
 source /koolshare/scripts/base.sh
 version="0.0.1"
 
-TEST_URL="https://baidu.com"
-if [ ! -z "`wget --no-check-certificate -O - $TEST_URL 2>&1|grep "100%"`" ]
-   then
-   HTTP_REQ="wget --no-check-certificate -O - "
-   POST_ARG="--post-data="
-else
-   command -v curl >/dev/null 2>&1 && curl -kI $TEST_URL >/dev/null 2>&1 || { echo >&2 "Xunlei-FastD1ck cannot find wget or curl installed with https(ssl) enabled in this system."; exit 1; }
-   HTTP_REQ="curl -ks"
-   POST_ARG="--data "
-fi
+#定义请求函数
+HTTP_REQ="wget --no-check-certificate -O - "
+POST_ARG="--post-data="
 
 #从dbus中获取uid，pwd等
 uid=$kuainiao_config_uid
