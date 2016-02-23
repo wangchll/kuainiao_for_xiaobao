@@ -36,8 +36,8 @@
 		        rrt.checked = true;
 		        document.getElementById('Kuainiao_detail_table').style.display = "";
 		    }
-			conf2obj();
-			var conf_ajax = setInterval("conf2obj();", 60000);
+			//conf2obj();
+			//var conf_ajax = setInterval("conf2obj();", 60000);
 			version_show();
 			write_kuainiao_install_status();
 		}
@@ -72,7 +72,7 @@
 				dataType: "script",
 				success: function(xhr) {
 			    	var p = "kuainiao_";
-			        var params = ["config_pwd", "warning", "enable","can_upgrade", "run_status", "run_warnning"];
+			        var params = ["warning","can_upgrade", "run_status", "run_warnning"];
 			        for (var i = 0; i < params.length; i++) {
 						if (typeof db_kuainiao_[p + params[i]] !== "undefined") {
 							$("#kuainiao_"+params[i]).val(db_kuainiao_[p + params[i]]);
@@ -81,7 +81,7 @@
 					update_visibility();
 					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
 					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
-					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream));
+					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_can_upgrade);
 				}
 			});
 		}
@@ -119,9 +119,11 @@
 		    }
 		}
 
-		function check_downstream(old, max) {
-			if (max > 0 && max > old) {
+		function check_downstream(old, max, upgrade) {
+			if (max > 0 && max > old && upgrade == "1") {
 				$("#kn_upgreade_state").html("宽带已从"+old+"M提速到"+max+"M");
+			} else {
+				$("#kn_upgreade_state").html("当前默认宽带为:"+old+"M,快鸟可以提速到:"+max+"M");
 			}
 		}
 
@@ -153,6 +155,19 @@
 					} else {
 						$("#kuainiao_install_show").html("");
 					}
+					//尝试合并函数
+					var p = "kuainiao_";
+					var params = ["warning","can_upgrade", "run_status", "run_warnning"];
+					for (var i = 0; i < params.length; i++) {
+						if (typeof db_kuainiao_[p + params[i]] !== "undefined") {
+							$("#kuainiao_"+params[i]).val(db_kuainiao_[p + params[i]]);
+						}
+					}
+					update_visibility();
+					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
+					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
+					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_can_upgrade);
+
 					setTimeout("write_kuainiao_install_status()", 2000);
 				}
 			});

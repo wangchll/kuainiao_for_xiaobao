@@ -2,10 +2,9 @@
 eval `dbus export kuainiao`
 source /koolshare/scripts/base.sh
 version="0.0.1"
-dbus set kuainiao_warning=""
-dbus set kuainiao_can_upgrade=0
 kuainiaocru=$(cru l | grep "kuainiao")
 startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
+
 
 #定义请求函数
 HTTP_REQ="wget --no-check-certificate -O - "
@@ -21,8 +20,6 @@ peerid=$(ifconfig $nic|grep $nic|awk 'gsub(/:/, "") {print $5}')004V
 dbus set kuainiao_config_nic=$nic
 dbus set kuainiao_config_peerid=$peerid
 dbus set kuainiao_version=$version
-#peerid=ACBC32AF6EED004V
-#uid_orig=$uid
 
 #获取迅雷用户uid
 get_xunlei_uid(){
@@ -242,6 +239,9 @@ if [ "$kuainiao_update_check" == "1" ];then
 fi
 
 ##主逻辑
+dbus set kuainiao_warning=""
+dbus set kuainiao_can_upgrade=0
+
 if [ "$kuainiao_enable" == "1" ]; then
 	#登陆迅雷获取uid
 	get_xunlei_uid
