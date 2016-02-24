@@ -11,7 +11,7 @@ POST_ARG="--post-data="
 
 #定义更新相关地址
 UPDATE_VERSION_URL="https://raw.githubusercontent.com/wangchll/kuainiao_for_xiaobao/master/version"
-UPDATE_TAR_URL="https://github.com/wangchll/kuainiao_for_xiaobao/kuainiao.tar.gz"
+UPDATE_TAR_URL="https://raw.githubusercontent.com/wangchll/kuainiao_for_xiaobao/master/kuainiao.tar.gz"
 
 #数据mock
 uname=$kuainiao_config_uname
