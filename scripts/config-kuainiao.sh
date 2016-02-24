@@ -1,13 +1,17 @@
 #!/bin/sh
 eval `dbus export kuainiao`
 source /koolshare/scripts/base.sh
-version="0.0.1"
+version="0.0.2"
 kuainiaocru=$(cru l | grep "kuainiao")
 startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
 
 #定义请求函数
 HTTP_REQ="wget --no-check-certificate -O - "
 POST_ARG="--post-data="
+
+#定义更新相关地址
+UPDATE_VERSION_URL="https://raw.githubusercontent.com/wangchll/kuainiao_for_xiaobao/master/version"
+UPDATE_TAR_URL="https://github.com/wangchll/kuainiao_for_xiaobao/kuainiao.tar.gz"
 
 #数据mock
 uname=$kuainiao_config_uname
@@ -173,7 +177,7 @@ stop_kuainiao(){
 
 #检查版本
 check_version(){
-	kuainiao_version_web1=$(curl -s https://raw.githubusercontent.com/koolshare/koolshare.github.io/master/kuainiao/version | sed -n 1p)
+	kuainiao_version_web1=$(curl -s $UPDATE_VERSION_URL | sed -n 1p)
 
 	if [ ! -z $kuainiao_version_web1 ];then
 		dbus set kuainiao_version_web=$kuainiao_version_web1
@@ -195,15 +199,15 @@ if [ "$kuainiao_update_check" == "1" ];then
 	# kuainiao_install_status=7	#检测更新错误！
 
 	dbus set kuainiao_install_status="6"
-	kuainiao_version_web1=`curl -s https://raw.githubusercontent.com/koolshare/koolshare.github.io/master/kuainiao/version | sed -n 1p)`
+	kuainiao_version_web1=`curl -s $UPDATE_VERSION_URL | sed -n 1p)`
 	if [ ! -z $kuainiao_version_web1 ];then
 		dbus set kuainiao_version_web=$kuainiao_version_web1
 		cmp=`versioncmp $kuainiao_version_web1 $kuainiao_version`
 		if [ "$cmp" = "-1" ];then
 			dbus set kuainiao_install_status="1"
 			cd /tmp
-			md5_web1=`curl -s https://raw.githubusercontent.com/koolshare/koolshare.github.io/master/kuainiao/version | sed -n 2p)`
-			wget --no-check-certificate --tries=1 --timeout=15 https://koolshare.github.io/kuainiao/kuainiao.tar.gz
+			md5_web1=`curl -s $UPDATE_VERSION_URL | sed -n 2p)`
+			wget --no-check-certificate --tries=1 --timeout=15 $UPDATE_TAR_URL
 			md5sum_gz=`md5sum /tmp/kuainiao.tar.gz | sed 's/ /\n/g'| sed -n 1p)`
 			if [ "$md5sum_gz" != "$md5_web1" ]; then
 				dbus set kuainiao_install_status="4"

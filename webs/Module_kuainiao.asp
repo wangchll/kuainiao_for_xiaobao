@@ -22,8 +22,8 @@
 		<script type="text/javascript" src="/general.js"></script>
 		<script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 		<script type="text/javascript" src="/dbconf?p=kuainiao_&v=<% uptime(); %>"></script>
-        <script type="text/javascript" src="http://i.xunlei.com/login/lib/rsa.js"></script>
-        <script type="text/javascript" src="http://i.xunlei.com/login/lib/md5.js"></script>
+        <script type="text/javascript" src="/res/rsa.js"></script>
+        <script type="text/javascript" src="/res/md5.js"></script>
         <script type="text/javascript">
 		function init() {
 			show_menu();
