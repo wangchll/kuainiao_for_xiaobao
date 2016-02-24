@@ -83,7 +83,7 @@
 					update_visibility();
 					check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
 					check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
-					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_can_upgrade);
+					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_run_status);
 				}
 			});
 		}
@@ -123,8 +123,8 @@
 		    }
 		}
 
-		function check_downstream(old, max, upgrade) {
-			if (max > 0 && max > old && upgrade == "1") {
+		function check_downstream(old, max, state) {
+			if (max > 0 && max > old && state == "1") {
 				$("#kn_upgreade_state").html("宽带已从"+old+"M提速到"+max+"M");
 			} else {
 				$("#kn_upgreade_state").html("当前默认宽带为:"+old+"M,快鸟可以提速到:"+max+"M");
