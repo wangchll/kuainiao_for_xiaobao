@@ -127,7 +127,9 @@
 			if (max > 0 && max > old && state == "1") {
 				$("#kn_upgreade_state").html("宽带已从"+old+"M提速到"+max+"M");
 			} else {
-				$("#kn_upgreade_state").html("当前默认宽带为:"+old+"M,快鸟可以提速到:"+max+"M");
+				if ( ! isNaN(old)) {
+					$("#kn_upgreade_state").html("当前默认宽带为:"+old+"M,快鸟可以提速到:"+max+"M");
+				}
 			}
 		}
 
@@ -181,7 +183,11 @@
 			if (db_kuainiao_['kuainiao_version'] != db_kuainiao_['kuainiao_version_web'] && db_kuainiao_['kuainiao_version_web'] !== undefined){
 				$("#kuainiao_version_status").html("<i>有新版本：" + db_kuainiao_['kuainiao_version_web']);
 			} else {
-				$("#kuainiao_version_status").html("<i>当前版本：" + db_kuainiao_['kuainiao_version']);
+				if (db_kuainiao_['kuainiao_version'] == undefined) {
+					$("#kuainiao_version_status").html("<i>当前版本：");
+				} else {
+					$("#kuainiao_version_status").html("<i>当前版本：" + db_kuainiao_['kuainiao_version']);
+				}
 			}
 		}
 		function update_kuainiao(o, s){
