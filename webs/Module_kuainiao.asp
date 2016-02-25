@@ -127,7 +127,7 @@
 			if (max > 0 && max > old && state == "1") {
 				$("#kn_upgreade_state").html("宽带已从"+old+"M提速到"+max+"M");
 			} else {
-				if ( ! isNaN(old)) {
+				if (+old) {
 					$("#kn_upgreade_state").html("当前默认宽带为:"+old+"M,快鸟可以提速到:"+max+"M");
 				}
 			}
