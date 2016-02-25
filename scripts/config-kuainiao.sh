@@ -1,7 +1,7 @@
 #!/bin/sh
 eval `dbus export kuainiao`
 source /koolshare/scripts/base.sh
-version="0.0.2"
+version="0.0.3"
 kuainiaocru=$(cru l | grep "kuainiao")
 startkuainiao=$(ls -l /koolshare/init.d/ | grep "S80Kuainiao")
 
@@ -169,8 +169,8 @@ stop_kuainiao(){
 	fi
 	#清理运行环境临时变量
 	dbus remove kuainiao_run_i
-	dbus remove kuainiao_run_warnning
-	dbus remove kuainiao_run_status
+	dbus set kuainiao_run_warnning=""
+	dbus set kuainiao_run_status=0
 	dbus remove kuainiao_run_orig_day
 	dbus remove kuainiao_run_session
 }
