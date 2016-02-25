@@ -174,7 +174,7 @@
 					update_visibility();
 					//check_selected("kuainiao_start", db_kuainiao_.kuainiao_start);
 					//check_selected("kuainiao_time", db_kuainiao_.kuainiao_time);
-					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_can_upgrade);
+					check_downstream(parseInt(db_kuainiao_.kuainiao_config_downstream), parseInt(db_kuainiao_.kuainiao_config_max_downstream), db_kuainiao_.kuainiao_run_status);
 
 					setTimeout("write_kuainiao_install_status()", 2000);
 				}
